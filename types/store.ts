@@ -10,8 +10,14 @@ export interface StoredSession {
   user: AuthUser;
 }
 
+export interface PersistedAuth {
+  refreshToken: string;
+  user: AuthUser;
+}
+
 export interface AuthState {
   accessToken: string | null;
   refreshToken: string | null;
   user: AuthUser | null;
+  rehydrated: boolean;
 }

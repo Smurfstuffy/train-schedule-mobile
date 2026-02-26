@@ -1,4 +1,5 @@
 import { useRouter } from 'expo-router';
+import { useState } from 'react';
 import {
   KeyboardAvoidingView,
   Platform,
@@ -11,18 +12,22 @@ import { zodResolver } from '@hookform/resolvers/zod';
 import { Controller, useForm } from 'react-hook-form';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
-import { Button, Input } from '@/components/common';
+import { Button, Input, ServerError } from '@/components/common';
+import { register as registerApi, getApiErrorMessage } from '@/lib/api';
+import { saveAuthSession } from '@/store/authStorage';
+import { useAppDispatch } from '@/store';
+import { setSession } from '@/store/slices/authSlice';
 import { ButtonVariant } from '@/types/components';
 import { type RegisterFormValues, registerSchema } from '@/types/auth';
 
 const RegisterScreen = () => {
   const insets = useSafeAreaInsets();
   const router = useRouter();
+  const dispatch = useAppDispatch();
+  const [serverError, setServerError] = useState<string | null>(null);
   const {
     control,
     handleSubmit,
-    setError,
-    clearErrors,
     formState: { errors, isSubmitting },
   } = useForm<RegisterFormValues>({
     resolver: zodResolver(registerSchema),
@@ -30,20 +35,14 @@ const RegisterScreen = () => {
   });
 
   const onSubmit = async (values: RegisterFormValues) => {
-    clearErrors('root');
+    setServerError(null);
     try {
-      // TODO: call auth API, e.g. await api.register(values);
-      console.log('Register', values);
+      const res = await registerApi(values.email, values.password);
+      await saveAuthSession(res.refreshToken, res.user);
+      dispatch(setSession(res));
       router.replace('/login');
     } catch (err: unknown) {
-      const message =
-        err &&
-        typeof err === 'object' &&
-        'message' in err &&
-        typeof (err as { message: unknown }).message === 'string'
-          ? (err as { message: string }).message
-          : 'Something went wrong. Please try again.';
-      setError('root', { message });
+      setServerError(getApiErrorMessage(err));
     }
   };
 
@@ -115,11 +114,7 @@ const RegisterScreen = () => {
               )}
             />
 
-            {(errors as { root?: { message?: string } }).root?.message ? (
-              <Text style={styles.rootError}>
-                {(errors as { root?: { message?: string } }).root?.message}
-              </Text>
-            ) : null}
+            <ServerError message={serverError} />
 
             <View style={styles.buttonWrap}>
               <Button
@@ -171,12 +166,6 @@ const styles = StyleSheet.create({
   },
   inputSpaced: {
     marginTop: 16,
-  },
-  rootError: {
-    fontSize: 13,
-    color: '#EF4444',
-    marginTop: 20,
-    textAlign: 'center',
   },
   buttonWrap: {
     marginTop: 24,

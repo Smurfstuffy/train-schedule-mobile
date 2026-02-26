@@ -1,4 +1,5 @@
 import { useRouter } from 'expo-router';
+import { useState } from 'react';
 import {
   KeyboardAvoidingView,
   Platform,
@@ -11,18 +12,22 @@ import { zodResolver } from '@hookform/resolvers/zod';
 import { Controller, useForm } from 'react-hook-form';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
-import { Button, Input } from '@/components/common';
+import { Button, Input, ServerError } from '@/components/common';
+import { login as loginApi, getApiErrorMessage } from '@/lib/api';
+import { saveAuthSession } from '@/store/authStorage';
+import { useAppDispatch } from '@/store';
+import { setSession } from '@/store/slices/authSlice';
 import { ButtonVariant } from '@/types/components';
 import { type LoginFormValues, loginSchema } from '@/types/auth';
 
 const LoginScreen = () => {
   const insets = useSafeAreaInsets();
   const router = useRouter();
+  const dispatch = useAppDispatch();
+  const [serverError, setServerError] = useState<string | null>(null);
   const {
     control,
     handleSubmit,
-    setError,
-    clearErrors,
     formState: { errors, isSubmitting },
   } = useForm<LoginFormValues>({
     resolver: zodResolver(loginSchema),
@@ -30,19 +35,14 @@ const LoginScreen = () => {
   });
 
   const onSubmit = async (values: LoginFormValues) => {
-    clearErrors('root');
+    setServerError(null);
     try {
-      // TODO: call auth API, e.g. await api.login(values);
-      console.log('Login', values);
+      const res = await loginApi(values.email, values.password);
+      await saveAuthSession(res.refreshToken, res.user);
+      dispatch(setSession(res));
+      router.replace('/(tabs)');
     } catch (err: unknown) {
-      const message =
-        err &&
-        typeof err === 'object' &&
-        'message' in err &&
-        typeof (err as { message: unknown }).message === 'string'
-          ? (err as { message: string }).message
-          : 'Something went wrong. Please try again.';
-      setError('root', { message });
+      setServerError(getApiErrorMessage(err));
     }
   };
 
@@ -97,11 +97,7 @@ const LoginScreen = () => {
               )}
             />
 
-            {(errors as { root?: { message?: string } }).root?.message ? (
-              <Text style={styles.rootError}>
-                {(errors as { root?: { message?: string } }).root?.message}
-              </Text>
-            ) : null}
+            <ServerError message={serverError} />
 
             <View style={styles.buttonWrap}>
               <Button
@@ -153,12 +149,6 @@ const styles = StyleSheet.create({
   },
   inputSpaced: {
     marginTop: 16,
-  },
-  rootError: {
-    fontSize: 13,
-    color: '#EF4444',
-    marginTop: 20,
-    textAlign: 'center',
   },
   buttonWrap: {
     marginTop: 24,

@@ -6,6 +6,7 @@ const initialState: AuthState = {
   accessToken: null,
   refreshToken: null,
   user: null,
+  rehydrated: false,
 };
 
 const authSlice = createSlice({
@@ -31,8 +32,11 @@ const authSlice = createSlice({
       state.refreshToken = null;
       state.user = null;
     },
+    setRehydrated: state => {
+      state.rehydrated = true;
+    },
   },
 });
 
-export const { setSession, clearSession } = authSlice.actions;
+export const { setSession, clearSession, setRehydrated } = authSlice.actions;
 export default authSlice.reducer;

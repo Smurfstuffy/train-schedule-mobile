@@ -1,6 +1,12 @@
-import { Stack } from 'expo-router';
-
+import { useAppSelector } from '@/store';
+import { Redirect, Stack } from 'expo-router';
 export default function AuthLayout() {
+  const refreshToken = useAppSelector(state => state.auth.refreshToken);
+
+  if (refreshToken) {
+    return <Redirect href="/(tabs)" />;
+  }
+
   return (
     <Stack screenOptions={{ headerShown: false }}>
       <Stack.Screen name="login" />

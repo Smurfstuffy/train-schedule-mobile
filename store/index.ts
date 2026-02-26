@@ -11,8 +11,8 @@ import authReducer, { clearSession, setSession } from './slices/authSlice';
 const authStorageMiddleware: Middleware = () => next => action => {
   const result = next(action);
   if (setSession.match(action)) {
-    const { accessToken, refreshToken, user } = action.payload;
-    void saveAuthSession(accessToken, refreshToken, user);
+    const { refreshToken, user } = action.payload;
+    void saveAuthSession(refreshToken, user);
   } else if (clearSession.match(action)) {
     void clearAuthSession();
   }
