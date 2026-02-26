@@ -10,8 +10,6 @@ import {
 } from 'react-native';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { Controller, useForm } from 'react-hook-form';
-import { useSafeAreaInsets } from 'react-native-safe-area-context';
-
 import { Button, Input, ServerError } from '@/components/common';
 import { login as loginApi, getApiErrorMessage } from '@/lib/api';
 import { saveAuthSession } from '@/store/authStorage';
@@ -21,7 +19,6 @@ import { ButtonVariant } from '@/types/components';
 import { type LoginFormValues, loginSchema } from '@/types/auth';
 
 const LoginScreen = () => {
-  const insets = useSafeAreaInsets();
   const router = useRouter();
   const dispatch = useAppDispatch();
   const [serverError, setServerError] = useState<string | null>(null);
@@ -47,12 +44,7 @@ const LoginScreen = () => {
   };
 
   return (
-    <View
-      style={[
-        styles.container,
-        { paddingTop: insets.top, paddingBottom: insets.bottom },
-      ]}
-    >
+    <View style={styles.container}>
       <KeyboardAvoidingView
         behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
         style={styles.keyboardView}
