@@ -25,3 +25,13 @@ export {
   type UpdateScheduleDto,
   type FilterSchedulesParams,
 } from './schedule';
+export {
+  getFavorites,
+  addFavorite,
+  removeFavorite,
+  favoriteKeys,
+  useFavoritesQuery,
+  useAddFavoriteMutation,
+  useRemoveFavoriteMutation,
+  type Favorite,
+} from './favorites';
