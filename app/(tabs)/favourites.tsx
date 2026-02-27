@@ -1,5 +1,6 @@
 import { Ionicons } from '@expo/vector-icons';
 import { useRouter } from 'expo-router';
+import { useMemo } from 'react';
 import {
   ActivityIndicator,
   FlatList,
@@ -11,32 +12,27 @@ import {
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
-import { useMemo } from 'react';
 import { ScheduleCard } from '@/components/schedule';
-import { useScheduleFilter } from '@/contexts/ScheduleFilterContext';
+import { getApiErrorMessage } from '@/lib/api';
 import {
-  useAddFavoriteMutation,
   useFavoritesQuery,
   useRemoveFavoriteMutation,
 } from '@/lib/api/favorites';
-import { useSchedulesQuery, type Schedule } from '@/lib/api/schedule';
-import { getApiErrorMessage } from '@/lib/api';
+import type { Schedule } from '@/types/api';
 
-export default function TabsIndexScreen() {
+export default function FavouritesScreen() {
   const router = useRouter();
-  const { filters } = useScheduleFilter();
   const {
-    data: schedules,
+    data: favorites = [],
     isLoading,
     isError,
     error,
-  } = useSchedulesQuery(filters);
-  const { data: favorites = [] } = useFavoritesQuery();
-  const addFavorite = useAddFavoriteMutation();
+  } = useFavoritesQuery();
   const removeFavorite = useRemoveFavoriteMutation();
 
-  const favoriteScheduleIds = useMemo(
-    () => new Set(favorites.map(f => f.scheduleId)),
+  const schedules: Schedule[] = useMemo(
+    () =>
+      favorites.map(f => f.schedule).filter((s): s is Schedule => s != null),
     [favorites],
   );
 
@@ -44,14 +40,8 @@ export default function TabsIndexScreen() {
     <ScheduleCard
       schedule={item}
       onPress={() => router.push(`/(tabs)/${item.id}`)}
-      isFavourite={favoriteScheduleIds.has(item.id)}
-      onToggleFavorite={() => {
-        if (favoriteScheduleIds.has(item.id)) {
-          removeFavorite.mutate(item.id);
-        } else {
-          addFavorite.mutate(item.id);
-        }
-      }}
+      isFavourite
+      onToggleFavorite={() => removeFavorite.mutate(item.id)}
     />
   );
 
@@ -72,7 +62,11 @@ export default function TabsIndexScreen() {
     }
     return (
       <View style={styles.centered}>
-        <Text style={styles.emptyText}>No schedules</Text>
+        <Ionicons name="heart-outline" size={48} color="#9CA3AF" />
+        <Text style={styles.emptyText}>No favourites yet</Text>
+        <Text style={styles.emptySubtext}>
+          Add schedules from the Schedules tab
+        </Text>
       </View>
     );
   };
@@ -80,16 +74,7 @@ export default function TabsIndexScreen() {
   return (
     <SafeAreaView style={styles.container} edges={['top']}>
       <View style={styles.header}>
-        <Pressable
-          onPress={() => router.push('/filter')}
-          style={({ pressed }) => [
-            styles.iconButton,
-            pressed && styles.iconButtonPressed,
-          ]}
-          hitSlop={12}
-        >
-          <Ionicons name="filter-outline" size={24} color="#E5E7EB" />
-        </Pressable>
+        <View style={styles.headerSpacer} />
         <Pressable
           onPress={() => router.push('/settings')}
           style={({ pressed }) => [
@@ -102,13 +87,12 @@ export default function TabsIndexScreen() {
         </Pressable>
       </View>
       <FlatList
-        data={schedules ?? []}
+        data={schedules}
         renderItem={renderItem}
         keyExtractor={item => item.id}
         contentContainerStyle={[
           styles.listContent,
-          (isLoading || isError || !schedules?.length) &&
-            styles.listContentGrow,
+          (isLoading || isError || !schedules.length) && styles.listContentGrow,
         ]}
         showsVerticalScrollIndicator={false}
         ListEmptyComponent={ListEmptyComponent}
@@ -125,10 +109,13 @@ const styles = StyleSheet.create({
   header: {
     flexDirection: 'row',
     alignItems: 'center',
-    justifyContent: 'space-between',
+    justifyContent: 'flex-end',
     paddingHorizontal: 24,
     paddingTop: 8,
     paddingBottom: 16,
+  },
+  headerSpacer: {
+    flex: 1,
   },
   iconButton: {
     padding: 4,
@@ -151,6 +138,12 @@ const styles = StyleSheet.create({
   emptyText: {
     fontSize: 16,
     color: '#9CA3AF',
+    marginTop: 12,
+  },
+  emptySubtext: {
+    fontSize: 14,
+    color: '#6B7280',
+    marginTop: 4,
   },
   listContent: {
     paddingHorizontal: 24,

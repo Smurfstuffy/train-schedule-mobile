@@ -14,4 +14,6 @@ export interface Schedule {
 export interface ScheduleCardProps {
   schedule: Schedule;
   onPress?: () => void;
+  isFavourite?: boolean;
+  onToggleFavorite?: () => void;
 }

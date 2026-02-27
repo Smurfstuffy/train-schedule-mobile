@@ -1,14 +1,44 @@
+import { Ionicons } from '@expo/vector-icons';
 import { memo } from 'react';
 import { Pressable, StyleSheet, Text, View } from 'react-native';
 
 import type { ScheduleCardProps } from '@/types/components/schedule';
 import { formatDateTime } from '@/utils/date';
 
-function ScheduleCardComponent({ schedule, onPress }: ScheduleCardProps) {
+const PRIMARY_BLUE = '#2563EB';
+
+function ScheduleCardComponent({
+  schedule,
+  onPress,
+  isFavourite = false,
+  onToggleFavorite,
+}: ScheduleCardProps) {
   const { routeName, departureDate, finishedDate, stops, train } = schedule;
 
   const cardContent = (
     <>
+      <View style={styles.cardHeader}>
+        <View style={styles.cardHeaderSpacer} />
+        {onToggleFavorite != null ? (
+          <Pressable
+            onPress={e => {
+              e.stopPropagation();
+              onToggleFavorite();
+            }}
+            style={({ pressed }) => [
+              styles.favoriteButton,
+              pressed && styles.favoriteButtonPressed,
+            ]}
+            hitSlop={8}
+          >
+            <Ionicons
+              name={isFavourite ? 'heart' : 'heart-outline'}
+              size={24}
+              color={PRIMARY_BLUE}
+            />
+          </Pressable>
+        ) : null}
+      </View>
       <Text style={styles.routeName}>{routeName}</Text>
       {train?.trainTitle ? (
         <Text style={styles.meta}>{train.trainTitle}</Text>
@@ -57,6 +87,22 @@ const styles = StyleSheet.create({
     borderRadius: 12,
     padding: 24,
     marginBottom: 16,
+  },
+  cardHeader: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'flex-end',
+    marginBottom: 4,
+  },
+  cardHeaderSpacer: {
+    flex: 1,
+  },
+  favoriteButton: {
+    padding: 4,
+    borderRadius: 8,
+  },
+  favoriteButtonPressed: {
+    opacity: 0.7,
   },
   cardPressed: {
     opacity: 0.9,

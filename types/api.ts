@@ -47,3 +47,10 @@ export interface FilterSchedulesParams {
   routeName?: string;
   trainTypeId?: string;
 }
+
+export interface Favorite {
+  id: string;
+  scheduleId: string;
+  schedule?: Schedule;
+  createdAt?: string;
+}
