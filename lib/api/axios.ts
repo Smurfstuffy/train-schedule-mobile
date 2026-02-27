@@ -5,10 +5,7 @@ import type { StoredSession } from '@/types/store';
 import { store } from '@/store';
 import { setSession } from '@/store/slices/authSlice';
 import { saveAuthSession } from '@/store/authStorage';
-
-const API_BASE_URL =
-  (typeof process !== 'undefined' && process.env?.EXPO_PUBLIC_API_URL) ||
-  'http://localhost:3000';
+import { API_BASE_URL } from '@/lib/config';
 
 export const apiClient = axios.create({
   baseURL: API_BASE_URL,
