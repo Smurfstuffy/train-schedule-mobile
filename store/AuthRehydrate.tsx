@@ -1,12 +1,9 @@
 import { useEffect } from 'react';
 import { useDispatch } from 'react-redux';
 import type { StoredSession } from '@/types/store';
+import { API_BASE_URL } from '@/lib/config';
 import { loadAuthSession } from './authStorage';
 import { clearSession, setRehydrated, setSession } from './slices/authSlice';
-
-const API_BASE_URL =
-  (typeof process !== 'undefined' && process.env?.EXPO_PUBLIC_API_URL) ||
-  'http://localhost:3000';
 
 export function AuthRehydrate({ children }: { children: React.ReactNode }) {
   const dispatch = useDispatch();
