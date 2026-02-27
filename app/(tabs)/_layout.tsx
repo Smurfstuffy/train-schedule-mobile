@@ -17,6 +17,7 @@ export default function TabsLayout() {
         <Stack.Screen name="filter" />
         <Stack.Screen name="[id]" />
         <Stack.Screen name="settings" />
+        <Stack.Screen name="new-schedule" />
       </Stack>
     </ScheduleFilterProvider>
   );

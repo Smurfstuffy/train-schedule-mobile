@@ -41,6 +41,15 @@ export default function SettingsScreen() {
       </View>
       <View style={styles.content}>
         {user?.email ? <Text style={styles.email}>{user.email}</Text> : null}
+        {user?.role === 'admin' ? (
+          <Button
+            variant={ButtonVariant.Primary}
+            onPress={() => router.push('/(tabs)/new-schedule')}
+            style={styles.createButton}
+          >
+            Create new schedule
+          </Button>
+        ) : null}
         <Button variant={ButtonVariant.Secondary} onPress={handleLogout}>
           Log out
         </Button>
@@ -85,6 +94,9 @@ const styles = StyleSheet.create({
   email: {
     fontSize: 15,
     color: '#9CA3AF',
+    marginBottom: 16,
+  },
+  createButton: {
     marginBottom: 16,
   },
 });

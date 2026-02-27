@@ -12,6 +12,7 @@ const ButtonComponent = ({
 }: ButtonProps) => {
   const isPrimary = variant === ButtonVariant.Primary;
   const isSecondary = variant === ButtonVariant.Secondary;
+  const isDanger = variant === ButtonVariant.Danger;
 
   return (
     <Pressable
@@ -21,6 +22,8 @@ const ButtonComponent = ({
         isPrimary && pressed && styles.primaryPressed,
         isSecondary && styles.secondary,
         isSecondary && pressed && styles.secondaryPressed,
+        isDanger && styles.danger,
+        isDanger && pressed && styles.dangerPressed,
         disabled && styles.disabled,
         style,
       ]}
@@ -32,6 +35,7 @@ const ButtonComponent = ({
           styles.text,
           isPrimary && styles.primaryText,
           isSecondary && styles.secondaryText,
+          isDanger && styles.dangerText,
         ]}
         numberOfLines={1}
       >
@@ -68,6 +72,17 @@ const styles = StyleSheet.create({
     backgroundColor: '#4B5563',
   },
   secondaryText: {
+    color: '#FFFFFF',
+    fontSize: 16,
+    fontWeight: '500',
+  },
+  danger: {
+    backgroundColor: '#DC2626',
+  },
+  dangerPressed: {
+    backgroundColor: '#B91C1C',
+  },
+  dangerText: {
     color: '#FFFFFF',
     fontSize: 16,
     fontWeight: '500',

@@ -1,6 +1,13 @@
 export { apiClient, getApiErrorMessage } from './axios';
 export { login, register, refresh, logout } from './auth';
-export { getTrainTypes, useTrainTypesQuery, type TrainType } from './trains';
+export {
+  getTrainTypes,
+  getTrains,
+  useTrainTypesQuery,
+  useTrainsQuery,
+  type Train,
+  type TrainType,
+} from './trains';
 export {
   getSchedules,
   getSchedule,
