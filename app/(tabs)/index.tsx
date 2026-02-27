@@ -12,12 +12,19 @@ import {
 import { SafeAreaView } from 'react-native-safe-area-context';
 
 import { ScheduleCard } from '@/components/schedule';
+import { useScheduleFilter } from '@/contexts/ScheduleFilterContext';
 import { useSchedulesQuery, type Schedule } from '@/lib/api/schedule';
 import { getApiErrorMessage } from '@/lib/api';
 
 export default function TabsIndexScreen() {
   const router = useRouter();
-  const { data: schedules, isLoading, isError, error } = useSchedulesQuery();
+  const { filters } = useScheduleFilter();
+  const {
+    data: schedules,
+    isLoading,
+    isError,
+    error,
+  } = useSchedulesQuery(filters);
 
   const renderItem: ListRenderItem<Schedule> = ({ item }) => (
     <ScheduleCard
@@ -51,12 +58,21 @@ export default function TabsIndexScreen() {
   return (
     <SafeAreaView style={styles.container} edges={['top']}>
       <View style={styles.header}>
-        <Text style={styles.title}>Schedule</Text>
+        <Pressable
+          onPress={() => router.push('/filter')}
+          style={({ pressed }) => [
+            styles.iconButton,
+            pressed && styles.iconButtonPressed,
+          ]}
+          hitSlop={12}
+        >
+          <Ionicons name="filter-outline" size={24} color="#E5E7EB" />
+        </Pressable>
         <Pressable
           onPress={() => router.push('/settings')}
           style={({ pressed }) => [
-            styles.settingsButton,
-            pressed && styles.settingsButtonPressed,
+            styles.iconButton,
+            pressed && styles.iconButtonPressed,
           ]}
           hitSlop={12}
         >
@@ -92,16 +108,11 @@ const styles = StyleSheet.create({
     paddingTop: 8,
     paddingBottom: 16,
   },
-  title: {
-    fontSize: 24,
-    fontWeight: '700',
-    color: '#FFFFFF',
-  },
-  settingsButton: {
+  iconButton: {
     padding: 4,
     borderRadius: 8,
   },
-  settingsButtonPressed: {
+  iconButtonPressed: {
     opacity: 0.7,
   },
   centered: {

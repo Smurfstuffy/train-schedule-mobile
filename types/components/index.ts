@@ -31,3 +31,18 @@ export interface InputProps extends Pick<
   containerStyle?: StyleProp<ViewStyle>;
   error?: string;
 }
+
+export interface DropdownOption {
+  value: string;
+  label: string;
+}
+
+export interface DropdownProps {
+  label: string;
+  value: string | null;
+  options: DropdownOption[];
+  placeholder?: string;
+  onSelect: (value: string) => void;
+  containerStyle?: StyleProp<ViewStyle>;
+  disabled?: boolean;
+}
