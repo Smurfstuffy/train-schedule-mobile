@@ -7,6 +7,7 @@ import {
 export enum ButtonVariant {
   Primary = 'primary',
   Secondary = 'secondary',
+  Danger = 'danger',
 }
 
 export interface ButtonProps {
@@ -30,4 +31,19 @@ export interface InputProps extends Pick<
   label: string;
   containerStyle?: StyleProp<ViewStyle>;
   error?: string;
+}
+
+export interface DropdownOption {
+  value: string;
+  label: string;
+}
+
+export interface DropdownProps {
+  label: string;
+  value: string | null;
+  options: DropdownOption[];
+  placeholder?: string;
+  onSelect: (value: string) => void;
+  containerStyle?: StyleProp<ViewStyle>;
+  disabled?: boolean;
 }

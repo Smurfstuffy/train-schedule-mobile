@@ -1,5 +1,7 @@
-import { Redirect, Tabs } from 'expo-router';
+import { Redirect, Stack } from 'expo-router';
 import { useAppSelector } from '@/store';
+
+import { ScheduleFilterProvider } from '@/contexts/ScheduleFilterContext';
 
 export default function TabsLayout() {
   const refreshToken = useAppSelector(state => state.auth.refreshToken);
@@ -9,8 +11,14 @@ export default function TabsLayout() {
   }
 
   return (
-    <Tabs screenOptions={{ headerShown: false }}>
-      <Tabs.Screen name="index" />
-    </Tabs>
+    <ScheduleFilterProvider>
+      <Stack screenOptions={{ headerShown: false }}>
+        <Stack.Screen name="index" />
+        <Stack.Screen name="filter" />
+        <Stack.Screen name="[id]" />
+        <Stack.Screen name="settings" />
+        <Stack.Screen name="new-schedule" />
+      </Stack>
+    </ScheduleFilterProvider>
   );
 }
