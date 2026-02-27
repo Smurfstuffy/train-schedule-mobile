@@ -1,50 +1,92 @@
-# Welcome to your Expo app 👋
+# Train Schedule (Mobile App)
 
-This is an [Expo](https://expo.dev) project created with [`create-expo-app`](https://www.npmjs.com/package/create-expo-app).
+Mobile client for the **Train Schedule** application: React Native (Expo) app for viewing and filtering train schedules, managing favorites, and (for admins) creating and editing schedules. Uses the Train Schedule API backend and receives real-time updates via WebSocket.
 
-## Get started
+## Project overview
 
-1. Install dependencies
+- **Authentication** — Login and register; JWT stored securely; refresh and logout.
+- **Schedules** — List with filters (date range, route name, train type); schedule detail; real-time updates when backend changes.
+- **Favorites** — Add/remove favorites from schedule cards; dedicated Favourites tab.
+- **Admin** — Create, edit, and delete schedules (admin role); form validation with React Hook Form + Zod.
+- **UI** — Bottom tabs (Schedules / Favourites); stack screens for filter, detail, settings, new-schedule.
 
-   ```bash
-   npm install
-   ```
+## Tech stack
 
-2. Start the app
+- **React Native** + **Expo** (SDK 54)
+- **Expo Router** (file-based routing)
+- **TypeScript**
+- **Redux Toolkit** (auth state, persistence)
+- **TanStack React Query** (API data, cache invalidation)
+- **React Hook Form** + **Zod** (form validation)
+- **Axios** (HTTP client, interceptors, refresh token)
+- **Socket.IO client** (real-time schedule events)
+- **ESLint** + **Prettier**
 
-   ```bash
-   npx expo start
-   ```
+## Prerequisites
 
-In the output, you'll find options to open the app in a
+- Node.js 18+
+- npm
+- Expo Go (device) or iOS/Android simulator
+- **Backend** running locally or a hosted API URL (e.g. Render)
 
-- [development build](https://docs.expo.dev/develop/development-builds/introduction/)
-- [Android emulator](https://docs.expo.dev/workflow/android-studio-emulator/)
-- [iOS simulator](https://docs.expo.dev/workflow/ios-simulator/)
-- [Expo Go](https://expo.dev/go), a limited sandbox for trying out app development with Expo
+## Environment variables
 
-You can start developing by editing the files inside the **app** directory. This project uses [file-based routing](https://docs.expo.dev/router/introduction).
+The app reads the API base URL from `EXPO_PUBLIC_API_URL`. Copy `.env.example` to `.env` and set:
 
-## Get a fresh project
+| Variable                | Description |
+|-------------------------|-------------|
+| `EXPO_PUBLIC_API_URL`   | Base URL of the Train Schedule API (no trailing slash). |
 
-When you're ready, run:
+**Examples:**
+
+- **Local backend:** `http://localhost:3000`  
+  For Android emulator use `http://10.0.2.2:3000` (or set this in `.env` when testing on Android).
+- **Hosted backend (e.g. Render):** `https://train-schedule-server-ztop.onrender.com`
+
+If `EXPO_PUBLIC_API_URL` is not set, the app falls back to `http://localhost:3000` (or `http://10.0.2.2:3000` on Android). Restart the Expo dev server after changing `.env` (e.g. `npx expo start -c`).
+
+## Setup
 
 ```bash
-npm run reset-project
+npm install
+cp .env.example .env
+# Edit .env and set EXPO_PUBLIC_API_URL (local or hosted)
+npx expo start
 ```
 
-This command will move the starter code to the **app-example** directory and create a blank **app** directory where you can start developing.
+Then open the app in iOS simulator, Android emulator, or Expo Go. Use **Sign in** with the demo credentials below.
 
-## Learn more
+## Demo credentials
 
-To learn more about developing your project with Expo, look at the following resources:
+Same as the backend (after seeding):
 
-- [Expo documentation](https://docs.expo.dev/): Learn fundamentals, or go into advanced topics with our [guides](https://docs.expo.dev/guides).
-- [Learn Expo tutorial](https://docs.expo.dev/tutorial/introduction/): Follow a step-by-step tutorial where you'll create a project that runs on Android, iOS, and the web.
+| Role  | Email               | Password  |
+|-------|---------------------|-----------|
+| Admin | `admin@example.com` | `admin123` |
+| User  | `user@example.com`  | `user123`  |
 
-## Join the community
+Admin can create/edit/delete schedules and see the “New schedule” flow; both roles can view schedules, filter, and use favorites.
 
-Join our community of developers creating universal apps.
+## Main screens
 
-- [Expo on GitHub](https://github.com/expo/expo): View our open source platform and contribute.
-- [Discord community](https://chat.expo.dev): Chat with Expo users and ask questions.
+- **Auth:** Login, Register
+- **Tabs:** Schedules (list + filter), Favourites
+- **Stack:** Filter, Schedule detail `[id]`, Settings, New schedule (admin)
+
+## Real-time updates
+
+When the backend emits schedule changes (create/update/delete), the app receives them over the WebSocket connection and invalidates React Query cache so lists and detail views update without manual refresh.
+
+## Scripts
+
+| Script              | Description |
+|---------------------|-------------|
+| `npm start`         | Start Expo dev server |
+| `npx expo start -c` | Start with cleared cache (use after changing .env) |
+| `npm run android`   | Open on Android |
+| `npm run ios`       | Open on iOS |
+| `npm run lint`      | ESLint |
+
+## License
+
+UNLICENSED (private).
