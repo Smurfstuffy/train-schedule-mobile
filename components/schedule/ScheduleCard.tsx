@@ -1,16 +1,8 @@
 import { memo } from 'react';
 import { Pressable, StyleSheet, Text, View } from 'react-native';
 
-import type { Schedule, ScheduleCardProps } from '@/types/components/schedule';
-
-function formatDate(iso: string): string {
-  const d = new Date(iso);
-  return d.toLocaleDateString(undefined, {
-    day: '2-digit',
-    month: 'short',
-    year: 'numeric',
-  });
-}
+import type { ScheduleCardProps } from '@/types/components/schedule';
+import { formatDateTime } from '@/utils/date';
 
 function ScheduleCardComponent({ schedule, onPress }: ScheduleCardProps) {
   const { routeName, departureDate, finishedDate, stops, train } = schedule;
@@ -26,11 +18,11 @@ function ScheduleCardComponent({ schedule, onPress }: ScheduleCardProps) {
       ) : null}
       <View style={styles.dates}>
         <Text style={styles.dateLabel}>Departure</Text>
-        <Text style={styles.dateValue}>{formatDate(departureDate)}</Text>
+        <Text style={styles.dateValue}>{formatDateTime(departureDate)}</Text>
       </View>
       <View style={styles.dates}>
         <Text style={styles.dateLabel}>Arrival</Text>
-        <Text style={styles.dateValue}>{formatDate(finishedDate)}</Text>
+        <Text style={styles.dateValue}>{formatDateTime(finishedDate)}</Text>
       </View>
       {stops.length > 0 ? (
         <View style={styles.stops}>

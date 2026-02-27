@@ -1,43 +1,52 @@
 import { Ionicons } from '@expo/vector-icons';
 import { useRouter } from 'expo-router';
-import { Pressable, ScrollView, StyleSheet, Text, View } from 'react-native';
+import {
+  ActivityIndicator,
+  FlatList,
+  ListRenderItem,
+  Pressable,
+  StyleSheet,
+  Text,
+  View,
+} from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
 import { ScheduleCard } from '@/components/schedule';
-import type { Schedule } from '@/types/components/schedule';
-
-const MOCK_SCHEDULES: Schedule[] = [
-  {
-    id: '1',
-    trainId: 'train-1',
-    routeName: 'Kyiv - Lviv',
-    departureDate: '2025-03-01T08:00:00.000Z',
-    finishedDate: '2025-03-01T14:30:00.000Z',
-    stops: ['Kyiv-Pasazhyrskyi', 'Vinnytsia', 'Zhmerynka', 'Ternopil', 'Lviv'],
-    train: { trainTitle: 'Intercity+ 45', trainType: { name: 'Intercity' } },
-  },
-  {
-    id: '2',
-    trainId: 'train-2',
-    routeName: 'Odesa - Kharkiv',
-    departureDate: '2025-03-02T06:15:00.000Z',
-    finishedDate: '2025-03-02T18:45:00.000Z',
-    stops: ['Odesa-Holovna', 'Mykolaiv', 'Dnipro', 'Poltava', 'Kharkiv'],
-    train: { trainTitle: 'Express 102', trainType: { name: 'Express' } },
-  },
-  {
-    id: '3',
-    trainId: 'train-3',
-    routeName: 'Lviv - Uzhhorod',
-    departureDate: '2025-03-03T09:00:00.000Z',
-    finishedDate: '2025-03-03T12:20:00.000Z',
-    stops: ['Lviv', 'Stryi', 'Mukachevo', 'Uzhhorod'],
-    train: { trainTitle: 'Regional 12', trainType: { name: 'Regional' } },
-  },
-];
+import { useSchedulesQuery, type Schedule } from '@/lib/api/schedule';
+import { getApiErrorMessage } from '@/lib/api';
 
 export default function TabsIndexScreen() {
   const router = useRouter();
+  const { data: schedules, isLoading, isError, error } = useSchedulesQuery();
+
+  const renderItem: ListRenderItem<Schedule> = ({ item }) => (
+    <ScheduleCard
+      schedule={item}
+      onPress={() => router.push(`/(tabs)/${item.id}`)}
+    />
+  );
+
+  const ListEmptyComponent = () => {
+    if (isLoading) {
+      return (
+        <View style={styles.centered}>
+          <ActivityIndicator size="large" color="#E5E7EB" />
+        </View>
+      );
+    }
+    if (isError) {
+      return (
+        <View style={styles.centered}>
+          <Text style={styles.errorText}>{getApiErrorMessage(error)}</Text>
+        </View>
+      );
+    }
+    return (
+      <View style={styles.centered}>
+        <Text style={styles.emptyText}>No schedules</Text>
+      </View>
+    );
+  };
 
   return (
     <SafeAreaView style={styles.container} edges={['top']}>
@@ -54,18 +63,18 @@ export default function TabsIndexScreen() {
           <Ionicons name="settings-outline" size={24} color="#E5E7EB" />
         </Pressable>
       </View>
-      <ScrollView
-        contentContainerStyle={styles.scrollContent}
+      <FlatList
+        data={schedules ?? []}
+        renderItem={renderItem}
+        keyExtractor={item => item.id}
+        contentContainerStyle={[
+          styles.listContent,
+          (isLoading || isError || !schedules?.length) &&
+            styles.listContentGrow,
+        ]}
         showsVerticalScrollIndicator={false}
-      >
-        {MOCK_SCHEDULES.map(schedule => (
-          <ScheduleCard
-            key={schedule.id}
-            schedule={schedule}
-            onPress={() => router.push(`/(tabs)/${schedule.id}`)}
-          />
-        ))}
-      </ScrollView>
+        ListEmptyComponent={ListEmptyComponent}
+      />
     </SafeAreaView>
   );
 }
@@ -95,8 +104,26 @@ const styles = StyleSheet.create({
   settingsButtonPressed: {
     opacity: 0.7,
   },
-  scrollContent: {
+  centered: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+    paddingHorizontal: 24,
+  },
+  errorText: {
+    fontSize: 16,
+    color: '#EF4444',
+    textAlign: 'center',
+  },
+  emptyText: {
+    fontSize: 16,
+    color: '#9CA3AF',
+  },
+  listContent: {
     paddingHorizontal: 24,
     paddingBottom: 48,
+  },
+  listContentGrow: {
+    flexGrow: 1,
   },
 });

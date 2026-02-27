@@ -5,13 +5,14 @@ import { Ionicons } from '@expo/vector-icons';
 
 import { Button } from '@/components/common';
 import { logout as logoutApi } from '@/lib/api';
-import { useAppDispatch } from '@/store';
+import { useAppDispatch, useAppSelector } from '@/store';
 import { clearSession } from '@/store/slices/authSlice';
 import { ButtonVariant } from '@/types/components';
 
 export default function SettingsScreen() {
   const router = useRouter();
   const dispatch = useAppDispatch();
+  const user = useAppSelector(state => state.auth.user);
 
   const handleLogout = async () => {
     try {
@@ -39,6 +40,7 @@ export default function SettingsScreen() {
         <View style={styles.backButton} />
       </View>
       <View style={styles.content}>
+        {user?.email ? <Text style={styles.email}>{user.email}</Text> : null}
         <Button variant={ButtonVariant.Secondary} onPress={handleLogout}>
           Log out
         </Button>
@@ -79,5 +81,10 @@ const styles = StyleSheet.create({
     flex: 1,
     paddingHorizontal: 24,
     paddingTop: 24,
+  },
+  email: {
+    fontSize: 15,
+    color: '#9CA3AF',
+    marginBottom: 16,
   },
 });
